@@ -2,7 +2,8 @@
 #define Vector3D_H
 #include<iostream>
 #include<cmath>
-#define sqr(n) (n)*(n)
+template <typename T>
+double sqr(const T& s){return s*s;}
 
 //ベクトルの定義と各種計算
 class Vector3D{
@@ -13,7 +14,7 @@ class Vector3D{
          
       //コンストラクタ
       Vector3D();
-      Vector3D(double x,double y,double z);
+      Vector3D(double x_,double y_,double z_);
          
       //代入演算子
       Vector3D& operator=(const Vector3D& v);
@@ -27,7 +28,6 @@ class Vector3D{
       Vector3D operator-()const;
 
       //添字演算子
-      //const double& operator[](int i) const;
       double& operator[](int i);
       const double& operator[](int i)const;
       
@@ -36,10 +36,12 @@ class Vector3D{
       bool operator!=(const Vector3D& v) const;
 
       //ベクトルの長さ
-      double norm()const;
+      double norm() const;
+      double norm2()const;
       
       //正規化
       void normalize();
+      //Vector3D normalize();
 };
 
 //ベクトル演算
@@ -66,8 +68,8 @@ inline std::ostream& operator<<(std::ostream& s, const Vector3D& v);
 /********メンバ関数の実装**********************************************/
 //コンストラクタ
 inline Vector3D::Vector3D(){x=y=z=0.0;}
-inline Vector3D::Vector3D(double x, double y, double z){
-   this->x=x;  this->y=y;  this->z=z;
+inline Vector3D::Vector3D(double x_, double y_, double z_){
+   this->x=x_;  this->y=y_;  this->z=z_;
 }
 //代入演算子
 inline Vector3D& Vector3D::operator=(const Vector3D& v){
@@ -91,10 +93,10 @@ inline Vector3D& Vector3D::operator/=(double k){
    this->x /= k;  this->y /= k;  this->z /= k;
    return *this;  
 }
-inline Vector3D Vector3D::operator+()const{//+Vecotr3D
+inline Vector3D Vector3D::operator+()const{//+Vector3D
    return *this;
 }
-inline Vector3D Vector3D::operator-()const{//-Vecotr3D
+inline Vector3D Vector3D::operator-()const{//-Vector3D
    return Vector3D(-x,-y,-z);
 }
 //添字演算子
@@ -130,6 +132,9 @@ inline bool Vector3D::operator!=(const Vector3D& v)const{
 //ベクトルの長さ
 inline double Vector3D::norm()const{
    return sqrt(sqr(x)+sqr(y)+sqr(z));
+}
+inline double Vector3D::norm2()const{
+   return (sqr(x)+sqr(y)+sqr(z));
 }
 //正規化
 inline void Vector3D::normalize(){

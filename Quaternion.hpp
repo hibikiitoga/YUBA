@@ -1,3 +1,5 @@
+#ifndef QUATERNION_H
+#define QUATERNION_H
 #include <cmath>
 #include <iostream>
 #include <cfloat>
@@ -115,3 +117,4 @@ inline std::ostream& operator<<(std::ostream& s, const Quaternion& q)
       sign(q.d);s<<"k";
       return s;
 }
+#endif
