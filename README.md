@@ -107,11 +107,42 @@ scalar=true または sc=true と入力して有効化する必要があり�
 10 11 0.8
 ```
 
-
 ## 導入
+clang-4.0 以上, boost 1.58 以上が必要です。
+
+例：
+```
+clang++4.0 -std=c++1y -stdlib=libc++ -I/path/boost/ -pthread -O2 YUBA.cpp -o yuba
+```
+
 ## 使用
-### 入力ファイルと出力ファイルの指定
-### モード指定
+### 入力ファイルと出力ファイルの指定（必須）
+入力ファイルを input.dat、また出力ファイル名を output とすると、
+```
+$ yuba input=input.dat output=output
+$ yuba in=input.dat out=output
+```
+として指定してください。
+
+### モード指定（必須）
+入力ファイルからどのような vtk ファイルを作成するかという設定を行ないます。
+
+例:
+```
+$ yuba input=input.dat output=output.dat mode=MODE
+```
+MODE の部分は、
+
+membrane: Coordinate タグで出力された座標と Triangle タグによって指定された座標間の結合情報に基づいてメッシュを作成します。
+
+beads: Bead タグで出力された座標を中心とする球を出力するモードです。
+
+bonds: Bead タグによって出力された座標と、Bond タグによって指定された座標間を結んだ円柱（チューブ）を作成します。
+
+volvox: membrane+beads
+
+tetra: bonds+beads
+
 ### ステップ数の指定
 ### Beadの直径の指定
 ### Bondの直径の指定
