@@ -204,7 +204,7 @@ $ yuba input=input.dat output=output.dat mode=MODE PBC=x,y
 オプションで変更可能です。
 出力するステップ数が多いときに効果があります。
 
-例
+例:
 ```
 yuba input=input.dat output=output.dat mode=MODE thread=8
 ```
