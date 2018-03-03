@@ -27,9 +27,9 @@
 4 -5.433235  0.073200  5.981148
 ```
 
-### Triangle　タグ
+### Triangle タグ
 “int int int int” によって構成されます。最初の数字は面のインデックスです。
-その後に続く数字は　Coordinate タグを用いて出力された座標に対応するインデックスであり、
+その後に続く数字は Coordinate タグを用いて出力された座標に対応するインデックスであり、
 これらの点を繋いだ面が作成されます。
 
 例:
@@ -42,7 +42,7 @@
 4 171 457 494
 ```
 
-### Bead　タグ
+### Bead タグ
 “int double double double” によって構成されます。最初の数字は座標のインデックスです。
 その後の数字は xyz 座標です。
 形式は Coordinate と同様ですが、この Bead ではある大きさをもった球が描画されます。
@@ -169,9 +169,48 @@ $ yuba input=input.dat output=output.dat mode=MODE step=X-Y,A-B,W,L,Z-AA
 $ yuba input=input.dat output=output.dat mode=MODE step=A,B,...,N
 ```
 
-### Beadの直径の指定
+### Bead の直径の指定
+何も指定されていない場合、直径 1.0 の球を出力します。
+変更する場合は、
+```
+$ yuba input=input.dat output=output.dat mode=MODE Bead_SIZE=1.234
+```
+などと指定してください。
+
 ### Bondの直径の指定
+何も指定されていない場合、直径 0.5 のチューブとして出力されます。変更する場合は、
+```
+$ yuba input=input.dat output=output.dat mode=MODE Bond_SIZE=1.234
+```
+などと指定してください。
+
 ### 周期境界条件の指定
+周期境界条件を考慮した描画は、Cell タグとの併用で可能となります。
+何も指定されていない場合、自由境界として扱われます。
+変更する場合は
+```
+$ yuba input=input.dat output=output.dat mode=MODE PBC=x,y,z
+```
+などと指定してください。
+2方向に周期境界条件を考慮している場合は
+```
+$ yuba input=input.dat output=output.dat mode=MODE PBC=x,y
+```
+などと指定することで任意の設定が可能です。
+
+
 ### 並行処理の設定
+基本は環境で決まっているスレッド最大数-2 スレッドを用いて処理を行いますが、
+オプションで変更可能です。
+出力するステップ数が多いときに効果があります。
+
+例
+```
+yuba input=input.dat output=output.dat mode=MODE thread=8
+```
+th=8 と略することも可能です。
+
 ## 最後に
+Bond、Cell 周りのコードは yde が書いてくれました。
+
 不具合や、ご要望がありましたらお気軽にご連絡ください。
