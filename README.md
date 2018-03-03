@@ -1,2 +1,4 @@
-# YUBA
-Program for generating vtk file from simulation result
+# YUBA (可視化支援ツール)
+自作プログラムを用いたモデルの計算を行っている方の負担を減らしつつ、
+十分な可視化が自由に行えるようすることを目的として、
+シミュレーション結果を多彩な描画機能をもつ可視化ソフト Paraview のための形式 (VTK) に変換するツール (YUBA) を作成しました。
