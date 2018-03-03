@@ -7,7 +7,7 @@
 std::array<double, 3> Cell_length;
 Vector3D center_of_cell;
 bool cell_f=false;
-bool scalar_f=false;
+//bool scalar_f=false;
 int Devide_N=2;
 int Devide_tube=50;
 
@@ -19,35 +19,38 @@ void RI(std::vector<Coordinate>& vertex_list,std::vector<Triangle>& triangle_lis
    #define Fg 1
    vertex_list.clear();triangle_list.clear();
    constexpr double G=(1+2.2360679774997896)/2.0;
-   Coordinate tmp;
-   n=0;
-   tmp.v.x= Fg;   tmp.v.y=  G;   tmp.v.z=  0;tmp.n=n++;     vertex_list.push_back(tmp);//0
-   tmp.v.x=-Fg;   tmp.v.y=  G;   tmp.v.z=  0;tmp.n=n++;     vertex_list.push_back(tmp);//1
-   tmp.v.x=-Fg;   tmp.v.y= -G;   tmp.v.z=  0;tmp.n=n++;     vertex_list.push_back(tmp);//2
-   tmp.v.x= Fg;   tmp.v.y= -G;   tmp.v.z=  0;tmp.n=n++;     vertex_list.push_back(tmp);//3
-   tmp.v.x=  0;   tmp.v.y= Fg;   tmp.v.z=  G;tmp.n=n++;     vertex_list.push_back(tmp);//4
-   tmp.v.x=  0;   tmp.v.y=-Fg;   tmp.v.z=  G;tmp.n=n++;     vertex_list.push_back(tmp);//5
-   tmp.v.x=  0;   tmp.v.y=-Fg;   tmp.v.z= -G;tmp.n=n++;     vertex_list.push_back(tmp);//6
-   tmp.v.x=  0;   tmp.v.y= Fg;   tmp.v.z= -G;tmp.n=n++;     vertex_list.push_back(tmp);//7
-   tmp.v.x=  G;   tmp.v.y=  0;   tmp.v.z= Fg;tmp.n=n++;     vertex_list.push_back(tmp);//8
-   tmp.v.x=  G;   tmp.v.y=  0;   tmp.v.z=-Fg;tmp.n=n++;     vertex_list.push_back(tmp);//9
-   tmp.v.x= -G;   tmp.v.y=  0;   tmp.v.z=-Fg;tmp.n=n++;     vertex_list.push_back(tmp);//10
-   tmp.v.x= -G;   tmp.v.y=  0;   tmp.v.z= Fg;tmp.n=n++;     vertex_list.push_back(tmp);//11
-   //each edge length is 2.0
-   #define RI_Edge_Length 2.0
    std::vector<std::pair<int,int> > RI_edges;
-   for(size_t fst=0,fst_size=vertex_list.size();fst<fst_size;++fst)
    {
-      for(size_t snd=0,snd_size=vertex_list.size();snd<snd_size;++snd)
+      Coordinate tmp;
+      n=0;
+      tmp.v.x= Fg; tmp.v.y=  G; tmp.v.z=  0;tmp.n=n++; vertex_list.push_back(tmp);//0
+      tmp.v.x=-Fg; tmp.v.y=  G; tmp.v.z=  0;tmp.n=n++; vertex_list.push_back(tmp);//1
+      tmp.v.x=-Fg; tmp.v.y= -G; tmp.v.z=  0;tmp.n=n++; vertex_list.push_back(tmp);//2
+      tmp.v.x= Fg; tmp.v.y= -G; tmp.v.z=  0;tmp.n=n++; vertex_list.push_back(tmp);//3
+      tmp.v.x=  0; tmp.v.y= Fg; tmp.v.z=  G;tmp.n=n++; vertex_list.push_back(tmp);//4
+      tmp.v.x=  0; tmp.v.y=-Fg; tmp.v.z=  G;tmp.n=n++; vertex_list.push_back(tmp);//5
+      tmp.v.x=  0; tmp.v.y=-Fg; tmp.v.z= -G;tmp.n=n++; vertex_list.push_back(tmp);//6
+      tmp.v.x=  0; tmp.v.y= Fg; tmp.v.z= -G;tmp.n=n++; vertex_list.push_back(tmp);//7
+      tmp.v.x=  G; tmp.v.y=  0; tmp.v.z= Fg;tmp.n=n++; vertex_list.push_back(tmp);//8
+      tmp.v.x=  G; tmp.v.y=  0; tmp.v.z=-Fg;tmp.n=n++; vertex_list.push_back(tmp);//9
+      tmp.v.x= -G; tmp.v.y=  0; tmp.v.z=-Fg;tmp.n=n++; vertex_list.push_back(tmp);//10
+      tmp.v.x= -G; tmp.v.y=  0; tmp.v.z= Fg;tmp.n=n++; vertex_list.push_back(tmp);//11
+      //each edge length is 2.0
+      #define RI_Edge_Length 2.0
+      //std::vector<std::pair<int,int> > RI_edges;
+      for(size_t fst=0,fst_size=vertex_list.size();fst<fst_size;++fst)
       {
-         if(fst<snd)
+         for(size_t snd=0,snd_size=vertex_list.size();snd<snd_size;++snd)
          {
-            const double dis = (vertex_list[fst].v-vertex_list[snd].v).norm();
-            if(fabs(dis-RI_Edge_Length)<D_ERROR)
+            if(fst<snd)
             {
-               RI_edges.push_back(
-                  std::pair<int,int> (vertex_list[fst].n, vertex_list[snd].n)
-               );
+               const double dis = (vertex_list[fst].v-vertex_list[snd].v).norm();
+               if(fabs(dis-RI_Edge_Length)<D_ERROR)
+               {
+                  RI_edges.push_back(
+                     std::pair<int,int> (vertex_list[fst].n, vertex_list[snd].n)
+                  );
+               }
             }
          }
       }
@@ -174,6 +177,7 @@ Sphere(const double radius)
 
    return std::pair<std::vector<Coordinate>,std::vector<Triangle> > (vertex_list,triangle_list);
 }
+
 
 //************************ tetra bond ************************************************
 //std::pair<std::vector<Coordinate>, std::vector<Rectangle<int>> >

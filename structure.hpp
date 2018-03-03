@@ -50,5 +50,23 @@ typedef struct{
    int v2;
 }Bond;
 
+typedef struct{
+   double x;
+   double y;
+   double z;
+   double theta;
+   double phi;
+   double a;
+   double b;
+}Ellipsoid3D;
+
+typedef struct{
+   double x;
+   double y;
+   double theta;
+   double a;
+   double b;
+}Ellipsoid2D;
+
 #endif
 

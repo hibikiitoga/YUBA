@@ -132,6 +132,43 @@ std::vector<Coordinate> cast_Coordinate(const std::vector<std::string>& req)
    return result;
 }
 
+std::vector<Vector3D> cast_Vector3D(const std::vector<std::string>& req)
+{
+   std::vector<Vector3D> result;
+   for(size_t i=0,size=req.size();i<size;++i)
+   {
+      result.push_back(cast_Vector3D(req[i]));
+   }
+   return result;
+}
+
+std::pair<Vector3D,double> cast_Bead_ex(const std::string& req)
+{
+   std::vector<std::string> vsplit;
+   boost::algorithm::split(vsplit, req, boost::is_any_of(" ,\t"));
+   return
+      std::pair<Vector3D,double>(
+      Vector3D
+      (
+         boost::lexical_cast<double> (vsplit[1]),
+         boost::lexical_cast<double> (vsplit[2]),
+         boost::lexical_cast<double> (vsplit[3])
+      ),
+         boost::lexical_cast<double> (vsplit[4])
+      );
+
+}
+
+std::vector<std::pair<Vector3D,double> > cast_Beads_ex(const std::vector<std::string>& req)
+{
+   std::vector<std::pair<Vector3D,double> > results;
+   for(size_t i=0,size=req.size();i<size;++i)
+   {
+      results.push_back(cast_Bead_ex(req[i]));
+   }
+   return results;
+}
+
 Triangle cast_Triangle(const std::string& req)
 {
    Triangle result;
@@ -203,6 +240,57 @@ std::vector<Bond> cast_Bond
       }
    }
    return bond_pair_list;
+}
+
+Ellipsoid3D cast_Ellipsoid3D
+(const std::string& req)
+{
+   Ellipsoid3D result;
+   std::vector<std::string> vs;
+   boost::algorithm::split(vs,req,boost::is_any_of(" ,\t"));
+   result.x     = boost::lexical_cast<double>(vs[0]);
+   result.y     = boost::lexical_cast<double>(vs[1]);
+   result.z     = boost::lexical_cast<double>(vs[2]);
+   result.theta = boost::lexical_cast<double>(vs[3]);
+   result.phi   = boost::lexical_cast<double>(vs[4]);
+   result.a     = boost::lexical_cast<double>(vs[5]);
+   result.b     = boost::lexical_cast<double>(vs[6]);
+   return result;
+}
+
+std::vector<Ellipsoid3D> cast_Ellipsoid3D(const std::vector<std::string>& req)
+{
+   std::vector<Ellipsoid3D> result;
+   std::vector<std::string> vs;
+   for(int i=0,size=req.size();i<size;++i)
+   {
+      result.push_back(cast_Ellipsoid3D(req.at(i)));
+   }
+   return result;
+}
+
+Ellipsoid2D cast_Ellipsoid2D
+(const std::string& req)
+{
+   Ellipsoid2D result;
+   std::vector<std::string> vs;
+   boost::algorithm::split(vs,req,boost::is_any_of(" ,\t"));
+   result.x     = boost::lexical_cast<double>(vs[0]);
+   result.y     = boost::lexical_cast<double>(vs[1]);
+   result.theta = boost::lexical_cast<double>(vs[2]);
+   result.a     = boost::lexical_cast<double>(vs[3]);
+   result.b     = boost::lexical_cast<double>(vs[4]);
+   return result;
+}
+
+std::vector<Ellipsoid2D> cast_Ellipsoid2D(const std::vector<std::string>& req)
+{
+   std::vector<Ellipsoid2D> result;
+   for(int i=0,size=req.size();i<size;++i)
+   {
+      result.push_back(cast_Ellipsoid2D(req.at(i)));
+   }
+   return result;
 }
 //cast scalar-----------------------------
 int cast_sc_bead(const std::string& req)
