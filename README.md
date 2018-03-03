@@ -144,6 +144,31 @@ volvox: membrane+beads
 tetra: bonds+beads
 
 ### ステップ数の指定
+ステップ数の指定をしない場合、YUBA は全てのステップから VTK ファイルを生成します。 
+任意のステップを出力したい場合、指定する必要があります。
+もしステップ X を出力する場合は、
+```
+$ yuba input=input.dat output=output.dat mode=MODE step=X
+```
+として指定します。もしステップ X, Y, Z を出力する場合は、
+```
+$ yuba input=input.dat output=output.dat mode=MODE step=X,Y,Z
+```
+とすれば複数指定可能です。そして範囲 X∼Y で指定する場合は
+```
+$ yuba input=input.dat output=output.dat mode=MODE step=X-Y
+```
+としてください。これは混在しても可能です。
+```
+$ yuba input=input.dat output=output.dat mode=MODE step=X-Y,A-B,W,L,Z-AA
+```
+入力ファイルに無い場合は無視されます。
+また、入力ファイル内にある最大のステップ数は _last_ として利用できます。
+等差数列を用いてステップを指定することも可能です.
+```
+$ yuba input=input.dat output=output.dat mode=MODE step=A,B,...,N
+```
+
 ### Beadの直径の指定
 ### Bondの直径の指定
 ### 周期境界条件の指定
