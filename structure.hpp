@@ -24,7 +24,7 @@
 #include <boost/lexical_cast.hpp>
 
 
-#include "Vector3Dedit.hpp"
+#include "Vector3D.hpp"
 
 /******************************/
 

@@ -1,4 +1,3 @@
-#warning //under alpha testing
 bool scalar_f=false;
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_io.hpp>
@@ -9,14 +8,13 @@ bool scalar_f=false;
 #include <thread>
 #include <cmath>
 #include <queue>
-#include "Vector3Dedit.hpp"
+#include "Vector3D.hpp"
 #include "Quaternion.hpp"
 #include "VTK_Geometry.hpp"
 #include "TextReader.hpp"
 #include "ReadFile.hpp"
 #include "PBC.hpp"
 #include "Sphere.hpp"
-#include "Analysis.hpp"
 #include "Output.hpp"
 #define RUN_NAME "YUBA"
 #include "Logger.hpp"
@@ -77,8 +75,6 @@ std::vector<tag_value>            tags;
 std::vector<active_step_unit>    steps;
 
 std::string                       mode;
-//std::string                 input_file;
-//std::string                output_file;
 std::set<unsigned int>   steps_in_file;
 
 Getline                vertices_stream;
@@ -89,7 +85,6 @@ Getline             bond_points_stream;
 Getline                      E2_stream;
 Getline                      E3_stream;
 
-//double                       Bead_SIZE;
 double                          Tube_R;
 int                            thd =-1;
 const Vector3D             null_vector;
@@ -146,7 +141,6 @@ int main(int argc, char* argv[])
          if
          (
             ("volvox"==md)||("tetra"==md)||("membrane"==md)||("beads"==md)||("bonds"==md)||("beads_ex"==md)||
-            ("sd"==md)||("shf"==md)||("darjeeling"==md)||
             ("ellipsoid2d"==md)||("ellipsoid3d==md")
          )
          {
@@ -202,20 +196,6 @@ int main(int argc, char* argv[])
                if(boost::iequals(vsplit_pbc[i_],"z")){ PBC_f[2]=true; }
             }
          }
-         if(boost::iequals(tags[i].tag,"SHF_n"))
-         {
-            std::vector<std::string> vs_shf_n;
-            boost::algorithm::split(vs_shf_n,tags[i].value,boost::is_any_of(","));
-            for(int i_=0,size_=vs_shf_n.size();i_<size_;++i_)
-            {
-               shf_ns.push_back(boost::lexical_cast<unsigned int>(vs_shf_n[i_]));
-            }
-         }
-         if(boost::iequals(tags[i].tag,"SD_tau"))
-         {
-            SD::SD_tau=boost::lexical_cast<int>(tags[i].value);
-         }
-
       }
       catch(boost::bad_lexical_cast &)
       {
@@ -362,200 +342,6 @@ int main(int argc, char* argv[])
       }
    }
 
-   if(boost::iequals("sd",mode)||boost::iequals("shf",mode)||boost::iequals("darjeeling",mode))
-   {
-      if(boost::iequals("sd",mode)||boost::iequals("darjeeling",mode))
-      {
-         #warning //TODO::check
-         using namespace SD;
-         //std::cout<<"in "<<input_file<<std::endl;
-         sd_past_stream.set(input_file);
-         sd_curr_stream.set(input_file);
-         extract_steps(steps_in_file,request);
-         if(!check())
-         {
-            std::cout<<"tau "<<SD_tau<<std::endl;
-            help("failure: sd option or input file");
-         }
-         for(int i=0,size=target_pair.first.size();i<size;++i)
-         {
-            const auto str_past =
-               str_list(sd_past_stream,"Bead",boost::lexical_cast<std::string>(target_pair.first[i]));
-            const auto str_curr = 
-               str_list(sd_curr_stream,"Bead",boost::lexical_cast<std::string>(target_pair.second[i]));
-            Beads
-               (
-                  boost::lexical_cast<unsigned int>(target_pair.second[i]),
-                  str_curr,
-                  calc_sd(TextReader::cast_Vector3D(str_past),TextReader::cast_Vector3D(str_curr))
-               );
-         }
-      }
-      if(boost::iequals("shf",mode)||boost::iequals("darjeeling",mode))
-      {
-         if(shf_ns.empty()){help("shf mode null");exit(0);}
-         using namespace SHF;
-         Getline shf_vertices_stream(input_file);
-         Getline shf_triangles_stream(input_file);
-         int index_target =0; int index_max_target = SD::target_pair.first.size();
-         int index_reqest =0; int index_max_reqest = request.size();
-         std::vector<std::string> str_vertices;
-         std::vector<std::string> str_triangles;
-         while((index_target<index_max_target) && (index_reqest<index_max_reqest))
-         {
-            int step;
-            if(boost::iequals("shf",mode))
-            {
-               str_vertices = str_list(shf_vertices_stream,"Coordinate",boost::lexical_cast<std::string>(request[index_reqest]));
-               str_triangles= str_list(shf_triangles_stream,"Triangle",boost::lexical_cast<std::string>(request[index_reqest]));
-               step=request[index_reqest];
-               ++index_reqest;
-            }
-            if(boost::iequals("darjeeling",mode))
-            {
-               str_vertices = str_list(shf_vertices_stream,"Coordinate",boost::lexical_cast<std::string>(SD::target_pair.second[index_reqest]));
-               str_triangles= str_list(shf_triangles_stream,"Triangle",boost::lexical_cast<std::string>(SD::target_pair.second[index_reqest]));
-               step=SD::target_pair.second[index_reqest];
-               ++index_reqest;
-            }
-            const std::vector<Vector3D> loaded_vesicle
-               =[&]()
-               {
-                  std::vector<Vector3D> result;
-                  result.reserve(str_vertices.size());
-                  std::for_each(str_vertices.begin(),str_vertices.end(),[&](const auto& ca){result.push_back(Coordinate2Vector3D(ca));});
-                  return result;
-               }();
-            const std::vector<Triangle> loaded_triangles
-               = [&]()
-               {
-                  std::vector<Triangle> result;
-                  result.reserve(str_vertices.size());
-                  std::for_each(str_triangles.begin(),str_triangles.end(),[&](const auto& ca){result.push_back(cast<Triangle>(ca));});
-                  return result;
-               }();
-            const std::vector<Vector3D> vesicle// center of the vesicle remove O
-               =[&loaded_vesicle]()->std::vector<Vector3D>
-               {
-                  std::vector<Vector3D> result=loaded_vesicle;
-                  Vector3D ave;
-                  std::for_each(loaded_vesicle.begin(),loaded_vesicle.end(),[&ave](const Vector3D& v){ave+=v;});
-                  ave/=(loaded_vesicle.size());
-                  std::for_each(result.begin(),result.end(),[&ave](Vector3D& v){v-=ave;});
-                  return result;
-               }();
-            const std::vector<std::vector<int> > vvNeighborPolygon
-               =[&]()->std::vector<std::vector<int> >
-               {
-                  const int N = loaded_vesicle.size();
-                  const int T = loaded_triangles.size();
-                  std::vector<std::vector<int> > result;
-                  for(int vtx=0;vtx<N;++vtx)
-                  {
-                     std::vector<int> tmp;//Alignment is unnecessary
-                     for(int tn=0;tn<T;++tn)
-                     {
-                        const Triangle& tri = loaded_triangles[tn];
-                        if((tri.a==vtx)||(tri.b==vtx)||(tri.c==vtx))
-                        {
-                           tmp.push_back(tri.n);
-                        }
-                     }
-                     result.push_back(tmp);
-                  }
-                  return result;
-               }();
-            const cdf radius_a
-               = [&]()
-               {
-                  double Area = 0.0;
-                  for(int i=0,size=vesicle.size();i<size;++i)
-                  {
-                     Area+=sigma_i(i,vvNeighborPolygon,loaded_triangles,vesicle);
-                  }
-                  return cdf(std::sqrt(Area/(4.0*M_PI)));
-               }();
-            const std::vector<SphV> epsilon_theta_phi_array
-               = [&vesicle,&radius_a]()
-               {
-                  auto vv=vesicle;
-                  for(int i=0,size=vv.size();i<size;++i)
-                  {
-                     vv[i]    = rect2sphV(vv[i]);
-                     vv[i].x -= radius_a.convert_to<double>();
-                  }
-                  return vv;
-               }();
-            //TODO::calc each mode and output
-            const auto Unm_v_array
-               = [&](const int& mode_n, const int& mode_m, const cdf& getA, const cdf& getB, const cdf& getD)
-               ->std::vector< std::complex<cdf> >
-               {
-                  std::vector< std::complex<cdf> > results;
-                  for(int i=0,size=vesicle.size();i<size;++i) 
-                  {
-                     const cdf u     = epsilon_theta_phi_array[i].x; 
-                     const cdf theta = epsilon_theta_phi_array[i].y; 
-                     const cdf phi   = epsilon_theta_phi_array[i].z;
-                     const cdf dS = sigma_i(i,vvNeighborPolygon,loaded_triangles,vesicle);
-                     const std::complex<cdf> Ynm_conjugate = CCY_fast(mode_n,mode_m,getA,getB,getD,theta,phi);
-                     results.push_back((u*Ynm_conjugate*dS)/(sqr(radius_a)));
-                  }
-                  return results;
-               };
-            const auto sum_it2
-               = [&radius_a](std::vector<double>& a, const std::vector< std::complex<cdf> >& b)
-               {
-                  for(int i=0,size=a.size();i<size;++i)
-                  {
-                     const std::complex<cdf>& c = b[i];
-                     const cdf U2 = (multiplication(c,std::conj(c))).real();
-                     a[i]+=U2.convert_to<double>();
-                  }
-               };
-            for(int n_i=0,n_i_max=shf_ns.size();n_i<=n_i_max;++n_i)
-            {
-               const int n_ = shf_ns[n_i];
-               if(n_>5){FATAL("over 5 mode");exit(0);}
-               std::vector<double> results_n_av;results_n_av.resize(vesicle.size());
-               const cdf getD = source::get_D(n_);
-               for(int m=0;m<=n_;++m)
-               {
-                  const cdf getB = source::get_B(n_,m);//(n,|m|)
-                  {//+m
-                     const cdf getA = source::get_A(m);
-                     sum_it2(results_n_av,Unm_v_array(n_,+m,getA,getB,getD));
-                  }
-                  if(m!=0)
-                  {//-m
-                     const cdf getA = source::get_A(-m);
-                     sum_it2(results_n_av,Unm_v_array(n_,-m,getA,getB,getD));
-                  }
-               }
-               const double r2 = (sqr(radius_a)).convert_to<double>();
-               std::for_each
-               (
-                  results_n_av.begin(),results_n_av.end(),
-                  [&r2,&n_](double & a)
-                  {
-                     a/=r2*(2*n+1);
-                  }
-               );
-               Membrane_base
-               (
-                  step,
-                  n_,
-                  loaded_vesicle,
-                  loaded_triangles,
-                  results_n_av
-               );
-            }
-         }//while end
-      }
-      return EXIT_SUCCESS;
-   }
-
-   //The file created by multithreading
    try
    {
       #define JOB_N_DEF 2
@@ -1037,7 +823,6 @@ str_list
 
 inline void help()
 {
-   std::cout<<"                         "<<"                    ver. 3.0 ( 20171205 hibiki)"<<std::endl;
    printf("\x1b[35m");
    std::cout<<"                       Y U B A"<<std::endl;
    std::cout<<std::endl;
@@ -1045,7 +830,7 @@ inline void help()
    std::cout<<"                    Essential:"<<std::endl;
    std::cout<<"       Input File : input=huga.dat or in=huga.dat"<<std::endl;
    std::cout<<"      Output File : output=huga    or out=huga"<<std::endl;
-   std::cout<<"        Data Mode : mode=piyo, ex. tetra, volvox, membrane, beads, beads_ex, bonds, sd, shf, darjeeling, "<<std::endl;
+   std::cout<<"        Data Mode : mode=piyo, ex. tetra, volvox, membrane, beads, beads_ex, bonds,"<<std::endl;
    std::cout<<"                                   ellipsoid2d, ellipsoid3d"<<std::endl;
    std::cout<<"   If you select bonds or tetra mode, add the option 'Bond_Point_type'. "<<std::endl;
    std::cout<<std::endl;
@@ -1062,10 +847,6 @@ inline void help()
    std::cout<<"Bonds Point Type  : Bond_Point_type=type (default: Coordinate)"<<std::endl;
    std::cout<<std::endl;
    printf("\x1b[31m");
-   std::cout<<"                      Analysis:"<<std::endl;
-   std::cout<<"Modes of vibration(n, spherical harmonics function): SHF_n=a,b (default: 2)"<<std::endl;
-   std::cout<<"Squared Displacement SD(t) of time interval: SD_tau=a"<<std::endl;
-   std::cout<<std::endl;
    printf("\x1b[39m"); 
    printf("\x1b[49m");
    std::cout<<"       Bug report : s116243@toyaku.ac.jp ( tetra, bond, scalar )"<<std::endl;
