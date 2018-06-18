@@ -421,7 +421,6 @@ int main(int argc, char* argv[])
          {//BOTH
             std::vector<std::thread>                       threads;
             std::vector<std::vector<std::string> >  str_list_beads;
-            //std::vector<Vector3D>                          centers;
             for(int t=i;t<thlimit;++t)
             {
                str_list_beads.push_back(str_list(beads_stream,"Bead",boost::lexical_cast<std::string>(request[t])));
@@ -430,7 +429,7 @@ int main(int argc, char* argv[])
             {
                threads.push_back(std::thread([&,t]()
                {
-                  Beads(boost::lexical_cast<unsigned int>(request[t]),str_list_beads[t-i]);
+                  Beads(boost::lexical_cast<unsigned int>(request[t]),str_list_beads[t-i],scalar_f);
                }));
             }
             std::for_each(threads.begin(),threads.end(),[](std::thread& t){t.join();});

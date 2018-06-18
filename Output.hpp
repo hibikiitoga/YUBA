@@ -5,8 +5,8 @@
 void Beads_base(   const unsigned int& step,const std::vector<Coordinate>& beads,const std::vector<double>& scalars);
 void Beads_ex_base(const unsigned int& step,const std::vector<std::pair<Vector3D,double> >& beads_ex,const std::vector<double>& scalars);
 
-void Beads(   const unsigned int& step,const std::vector<std::string>& list,const std::vector<double>& scalars=std::vector<double>());
-void Beads_ex(const unsigned int& step,const std::vector<std::string>& list, bool scalar_f=false;);
+void Beads(   const unsigned int& step,const std::vector<std::string>& list, bool scalar_f=false);
+void Beads_ex(const unsigned int& step,const std::vector<std::string>& list, bool scalar_f=false);
 
 
 void Membrane_base
@@ -233,9 +233,25 @@ void Beads
 (
    const unsigned int& step,
    const std::vector<std::string>& list,
-   const std::vector<double>& scalars
+   bool scalar_f
 )
 {
+   const std::vector<double> scalars = [&list,scalar_f]()
+   {
+      std::vector<double> res;
+      if(!scalar_f){return res;}
+      for(size_t i=0,i_size=list.size();i<i_size;++i)
+      {
+         std::vector<std::string> vs;
+         boost::algorithm::split(vs, list.at(i), boost::is_any_of(" ,\t"));
+	 if(vs.size()==5)//index x y z scalar
+	 {
+	    res.push_back(boost::lexical_cast<double>(vs.back()));
+	 }
+         else{std::cout<<"defect __LINE__"<<std::endl;exit(0);}
+         return res;
+      }
+   }();
    return Beads_base(step,TextReader::cast_Coordinate(list),scalars);
 }
 
@@ -254,7 +270,7 @@ void Beads_ex
       {
          std::vector<std::string> vs;
          boost::algorithm::split(vs, list.at(i), boost::is_any_of(" ,\t"));
-	 if(vs.size()==5)
+	 if(vs.size()==6)//index x y z radius scalar
 	 {
 	    res.push_back(boost::lexical_cast<double>(vs.back()));
 	 }
