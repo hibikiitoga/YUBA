@@ -452,7 +452,7 @@ int main(int argc, char* argv[])
                      (
                         [&,t]() 
                         {
-                           Beads_ex(boost::lexical_cast<unsigned int>(request[t]),str_list_beads_ex[t-i]);
+                           Beads_ex(boost::lexical_cast<unsigned int>(request[t]),str_list_beads_ex[t-i],scalar_f);
                         }
                      ) 
                   );
