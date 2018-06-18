@@ -147,6 +147,10 @@ int main(int argc, char* argv[])
             mode=md;
             flags.mode_f=true;
          }
+         else
+         {
+            std::cout<<"mode fail"<<std::endl;
+            exit(0);}
       }
       try{
          
@@ -421,7 +425,6 @@ int main(int argc, char* argv[])
          {//BOTH
             std::vector<std::thread>                       threads;
             std::vector<std::vector<std::string> >  str_list_beads;
-            //std::vector<Vector3D>                          centers;
             for(int t=i;t<thlimit;++t)
             {
                str_list_beads.push_back(str_list(beads_stream,"Bead",boost::lexical_cast<std::string>(request[t])));
@@ -849,8 +852,8 @@ inline void help()
    printf("\x1b[31m");
    printf("\x1b[39m"); 
    printf("\x1b[49m");
-   std::cout<<"       Bug report : s116243@toyaku.ac.jp ( tetra, bond, scalar )"<<std::endl;
-   std::cout<<"                    s096020@toyaku.ac.jp ( otherwise )"<<std::endl;
+   std::cout<<"       Bug report : @master-yde ( tetra, bond, scalar )"<<std::endl;
+   std::cout<<"                    @misteltein ( otherwise )"<<std::endl;
 }
 inline void help(const std::string& additional, std::string message)
 {
