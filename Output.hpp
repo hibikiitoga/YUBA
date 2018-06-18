@@ -6,7 +6,7 @@ void Beads_base(   const unsigned int& step,const std::vector<Coordinate>& beads
 void Beads_ex_base(const unsigned int& step,const std::vector<std::pair<Vector3D,double> >& beads_ex,const std::vector<double>& scalars);
 
 void Beads(   const unsigned int& step,const std::vector<std::string>& list,const std::vector<double>& scalars=std::vector<double>());
-void Beads_ex(const unsigned int& step,const std::vector<std::string>& list,const std::vector<double>& scalars=std::vector<double>());
+void Beads_ex(const unsigned int& step,const std::vector<std::string>& list);
 
 
 void Membrane_base
