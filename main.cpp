@@ -147,6 +147,10 @@ int main(int argc, char* argv[])
             mode=md;
             flags.mode_f=true;
          }
+         else
+         {
+            std::cout<<"mode fail"<<std::endl;
+            exit(0);}
       }
       try{
          
@@ -429,7 +433,7 @@ int main(int argc, char* argv[])
             {
                threads.push_back(std::thread([&,t]()
                {
-                  Beads(boost::lexical_cast<unsigned int>(request[t]),str_list_beads[t-i],scalar_f);
+                  Beads(boost::lexical_cast<unsigned int>(request[t]),str_list_beads[t-i]);
                }));
             }
             std::for_each(threads.begin(),threads.end(),[](std::thread& t){t.join();});
@@ -451,7 +455,7 @@ int main(int argc, char* argv[])
                      (
                         [&,t]() 
                         {
-                           Beads_ex(boost::lexical_cast<unsigned int>(request[t]),str_list_beads_ex[t-i],scalar_f);
+                           Beads_ex(boost::lexical_cast<unsigned int>(request[t]),str_list_beads_ex[t-i]);
                         }
                      ) 
                   );
