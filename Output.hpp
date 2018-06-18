@@ -84,8 +84,8 @@ void Beads_base
       }
    }
    ofs_b.close();
-   return ;
 
+   return ;
 }
 
 void Beads_ex_base

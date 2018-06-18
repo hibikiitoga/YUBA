@@ -848,8 +848,8 @@ inline void help()
    printf("\x1b[31m");
    printf("\x1b[39m"); 
    printf("\x1b[49m");
-   std::cout<<"       Bug report : s116243@toyaku.ac.jp ( tetra, bond, scalar )"<<std::endl;
-   std::cout<<"                    s096020@toyaku.ac.jp ( otherwise )"<<std::endl;
+   std::cout<<"       Bug report : @master-yde ( tetra, bond, scalar )"<<std::endl;
+   std::cout<<"                    @misteltein ( otherwise )"<<std::endl;
 }
 inline void help(const std::string& additional, std::string message)
 {
