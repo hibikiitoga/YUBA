@@ -45,7 +45,7 @@ typedef struct{
 }Rectangle;
 
 typedef struct{
-   int scalar=-1;
+   double scalar=-1;
    int v1;
    int v2;
 }Bond;
