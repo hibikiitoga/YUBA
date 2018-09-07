@@ -827,7 +827,7 @@ str_list
 inline void help()
 {
    printf("\x1b[35m");
-   std::cout<<"                       Y U B A"<<std::endl;
+   std::cout<<"                       Y U B A                                   v. 3.0.1"<<std::endl;
    std::cout<<std::endl;
    printf("\x1b[32m");
    std::cout<<"                    Essential:"<<std::endl;

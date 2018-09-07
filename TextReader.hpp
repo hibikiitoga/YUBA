@@ -209,7 +209,7 @@ Bond bond_pair
    result.v2 = boost::lexical_cast<int>  (vsplit[1]);
    if(scalar_f)
    {
-      result.scalar=boost::lexical_cast<int> (vsplit[2]);
+      result.scalar=boost::lexical_cast<double> (vsplit[2]);
    }
    else
    {
