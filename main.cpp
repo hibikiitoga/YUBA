@@ -18,6 +18,8 @@ bool scalar_f=false;
 #include "Output.hpp"
 #define RUN_NAME "YUBA"
 #include "Logger.hpp"
+#include "Eigen/Dense"
+#include "Chaperone/heap.hpp"
 
 std::pair<std::vector<Coordinate>,std::vector<Triangle> > Sphere_template;
 
@@ -90,6 +92,8 @@ int                            thd =-1;
 const Vector3D             null_vector;
 std::vector<unsigned int>  shf_ns;
 
+bool pca_f=false;
+
 /////////////////
 void step_picker (const std::string& req,bool& f);
 void Membrane
@@ -150,7 +154,12 @@ int main(int argc, char* argv[])
          else
          {
             std::cout<<"mode fail"<<std::endl;
-            exit(0);}
+            exit(0);
+         }
+      }
+      if(tags[i].tag=="PCA" && tags[i].value=="true")
+      {
+         pca_f=true; 
       }
       try{
          
@@ -510,6 +519,60 @@ void Membrane
    std::vector<Coordinate> vertices       = TextReader::cast_Coordinate(list_vertices);
    const std::vector<Triangle>& triangles = TextReader::cast_Triangle(list_triangles);
 
+   if(pca_f)
+   {
+      std::tuple<heap,heap,heap,heap> sum_and_c; 
+      for(const auto& r: vertices)
+      {
+         std::get<0>(sum_and_c) += r.v.x;
+         std::get<1>(sum_and_c) += r.v.y;
+         std::get<2>(sum_and_c) += r.v.z;
+         std::get<3>(sum_and_c) += 1;
+      }
+      const std::tuple<double,double,double> mean
+         (
+            std::get<0>(sum_and_c).get()/std::get<3>(sum_and_c).get(), 
+            std::get<1>(sum_and_c).get()/std::get<3>(sum_and_c).get(), 
+            std::get<2>(sum_and_c).get()/std::get<3>(sum_and_c).get()
+         );
+      for(size_t i=0,size=vertices.size();i<size;++i)
+      {
+         auto& r = vertices.at(i);
+         r.v.x-=std::get<0>(mean);
+         r.v.y-=std::get<1>(mean);
+         r.v.z-=std::get<2>(mean);
+      }
+      heap xx; heap yy; heap zz;
+      heap xy; heap xz; heap yz;
+      for(size_t i=0,size=vertices.size();i<size;++i)
+      {
+         const auto& r = vertices.at(i);
+         xx += r.v.x * r.v.x;
+         yy += r.v.y * r.v.y;
+         zz += r.v.z * r.v.z;
+         xy += r.v.x * r.v.y;
+         yz += r.v.y * r.v.z;
+         xz += r.v.z * r.v.x;
+      }
+      Eigen::Matrix<double, 3, 3> cov;
+      cov << 
+         xx.get()/vertices.size(), xy.get()/vertices.size(), xz.get()/vertices.size(),
+         xy.get()/vertices.size(), yy.get()/vertices.size(), yz.get()/vertices.size(),
+         xz.get()/vertices.size(), yz.get()/vertices.size(), zz.get()/vertices.size();
+
+      Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, 3, 3> > es(cov);
+      const Vector3D PC1(es.eigenvectors()(0,0),es.eigenvectors()(0,1),es.eigenvectors()(0,2));
+      const Vector3D PC2(es.eigenvectors()(1,0),es.eigenvectors()(1,1),es.eigenvectors()(1,2));
+      const Vector3D PC3(es.eigenvectors()(2,0),es.eigenvectors()(2,1),es.eigenvectors()(2,2));
+      for(auto& r: vertices)
+      {
+         const Vector3D tmp = r.v;
+         r.v.x = PC1*tmp;
+         r.v.y = PC2*tmp;
+         r.v.z = PC3*tmp;
+      }
+   }
+
    //Mesh Output
    std::string mesh_file = output_file+"_mesh_"+str_step+".vtk";
    std::ofstream ofs_m(mesh_file,std::ios::trunc);
@@ -848,6 +911,7 @@ inline void help()
    std::cout<<" Beads Roughness  : Bead_Grain=ho or BG=ho  [rough, normal, fine]"<<std::endl;
    std::cout<<" Bonds Roughness  : Bond_Grain=ho or BoG=ho [rough, normal, fine]"<<std::endl;
    std::cout<<"Bonds Point Type  : Bond_Point_type=type (default: Coordinate)"<<std::endl;
+   std::cout<<"           Other  : PCA=true"<<std::endl;
    std::cout<<std::endl;
    printf("\x1b[31m");
    printf("\x1b[39m"); 
