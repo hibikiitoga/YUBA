@@ -561,15 +561,17 @@ void Membrane
          xz.get()/vertices.size(), yz.get()/vertices.size(), zz.get()/vertices.size();
 
       Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, 3, 3> > es(cov);
-      const Vector3D PC1(es.eigenvectors()(0,0),es.eigenvectors()(0,1),es.eigenvectors()(0,2));
-      const Vector3D PC2(es.eigenvectors()(1,0),es.eigenvectors()(1,1),es.eigenvectors()(1,2));
-      const Vector3D PC3(es.eigenvectors()(2,0),es.eigenvectors()(2,1),es.eigenvectors()(2,2));
+      std::vector<std::tuple<Vector3D,double>> PCs;
+      PCs.emplace_back(Vector3D(es.eigenvectors()(0,0),es.eigenvectors()(0,1),es.eigenvectors()(0,2)),es.eigenvalues()[0]);
+      PCs.emplace_back(Vector3D(es.eigenvectors()(1,0),es.eigenvectors()(1,1),es.eigenvectors()(1,2)),es.eigenvalues()[1]);
+      PCs.emplace_back(Vector3D(es.eigenvectors()(2,0),es.eigenvectors()(2,1),es.eigenvectors()(2,2)),es.eigenvalues()[2]);
+      std::sort(PCs.begin(),PCs.end(),[](auto& a, auto& b){return std::get<double>(a)>std::get<double>(b);});
       for(auto& r: vertices)
       {
          const Vector3D tmp = r.v;
-         r.v.x = PC1*tmp;
-         r.v.y = PC2*tmp;
-         r.v.z = PC3*tmp;
+         r.v.x = std::get<Vector3D>(PCs.at(0))*tmp;
+         r.v.y = std::get<Vector3D>(PCs.at(1))*tmp;
+         r.v.z = std::get<Vector3D>(PCs.at(2))*tmp;
       }
    }
 
