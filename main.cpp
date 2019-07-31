@@ -159,22 +159,22 @@ int main(int argc, char* argv[])
       }
       if(tags[i].tag=="PCA" && tags[i].value=="true")
       {
-         pca_f=true; 
+         pca_f=true;
       }
       try{
-         
+
          if(boost::iequals(tags[i].tag, "Bead_SIZE"))
-         { 
+         {
             Bead_SIZE=boost::lexical_cast<double>(tags[i].value);
          }
-         
+
          if(boost::iequals(tags[i].tag, "Bond_SIZE"))
          { Tube_R=boost::lexical_cast<double>(tags[i].value);}
 
          if(boost::iequals(tags[i].tag, "thread") || boost::iequals(tags[i].tag, "th"))
          { thd=boost::lexical_cast<int> (tags[i].value);}
 
-         if(boost::iequals(tags[i].tag, "Bead_Grain") || boost::iequals(tags[i].tag, "bg") || 
+         if(boost::iequals(tags[i].tag, "Bead_Grain") || boost::iequals(tags[i].tag, "bg") ||
             boost::iequals(tags[i].tag,"Grain"))
          {
             if(boost::iequals(tags[i].value,"finest")){ Devide_N= 4;}
@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
             steps_in_file.insert(boost::lexical_cast<unsigned int> (vs[2]));
          }
          else if(vs[1]=="Cell")
-         {  
+         {
             if(vs.size()>3)
             {
                Cell_length[0]=boost::lexical_cast<double> (vs[2]);
@@ -303,8 +303,8 @@ int main(int argc, char* argv[])
                points.push_back
                (
                   Vector3D (
-                     c.x + ((x==0)?Cell_length[0]/2.0:-Cell_length[0]/2.0),   
-                     c.y + ((y==0)?Cell_length[1]/2.0:-Cell_length[1]/2.0),   
+                     c.x + ((x==0)?Cell_length[0]/2.0:-Cell_length[0]/2.0),
+                     c.y + ((y==0)?Cell_length[1]/2.0:-Cell_length[1]/2.0),
                      c.z + ((z==0)?Cell_length[2]/2.0:-Cell_length[2]/2.0)
                   )
                );
@@ -381,7 +381,7 @@ int main(int argc, char* argv[])
                }
             }
             if(Bond_Point_type=="none"){Bond_Point_type="Coordinate";}
-            
+
             for(int t=i;t<thlimit;++t)
             {
                str_list_bond_points.push_back
@@ -419,7 +419,7 @@ int main(int argc, char* argv[])
                str_list_triangles.push_back
                (
                   str_list(triangles_stream,"Triangle",boost::lexical_cast<std::string>(request[t]))
-               ); 
+               );
             }
             for(int t=i;t<thlimit;++t)
             {
@@ -446,7 +446,7 @@ int main(int argc, char* argv[])
                }));
             }
             std::for_each(threads.begin(),threads.end(),[](std::thread& t){t.join();});
-         
+
          }
          if(boost::iequals("beads_ex",mode))
          {
@@ -462,11 +462,11 @@ int main(int argc, char* argv[])
                   (
                      std::thread
                      (
-                        [&,t]() 
+                        [&,t]()
                         {
                            Beads_ex(boost::lexical_cast<unsigned int>(request[t]),str_list_beads_ex[t-i]);
                         }
-                     ) 
+                     )
                   );
             }
             std::for_each(threads.begin(),threads.end(),[](std::thread& t){t.join();});
@@ -485,15 +485,15 @@ int main(int argc, char* argv[])
                   (
                      std::thread
                      (
-                        [&,t]() 
+                        [&,t]()
                         {
                            E2(boost::lexical_cast<unsigned int>(request[t]),str_list_e2[t-i]);
                         }
-                     ) 
+                     )
                   );
             }
             std::for_each(threads.begin(),threads.end(),[](std::thread& t){t.join();});
-            
+
          }
       }
    }
@@ -521,7 +521,7 @@ void Membrane
 
    if(pca_f)
    {
-      std::tuple<heap,heap,heap,heap> sum_and_c; 
+      std::tuple<heap,heap,heap,heap> sum_and_c;
       for(const auto& r: vertices)
       {
          std::get<0>(sum_and_c) += r.v.x;
@@ -531,8 +531,8 @@ void Membrane
       }
       const std::tuple<double,double,double> mean
          (
-            std::get<0>(sum_and_c).get()/std::get<3>(sum_and_c).get(), 
-            std::get<1>(sum_and_c).get()/std::get<3>(sum_and_c).get(), 
+            std::get<0>(sum_and_c).get()/std::get<3>(sum_and_c).get(),
+            std::get<1>(sum_and_c).get()/std::get<3>(sum_and_c).get(),
             std::get<2>(sum_and_c).get()/std::get<3>(sum_and_c).get()
          );
       for(size_t i=0,size=vertices.size();i<size;++i)
@@ -555,7 +555,7 @@ void Membrane
          xz += r.v.z * r.v.x;
       }
       Eigen::Matrix<double, 3, 3> cov;
-      cov << 
+      cov <<
          xx.get()/vertices.size(), xy.get()/vertices.size(), xz.get()/vertices.size(),
          xy.get()/vertices.size(), yy.get()/vertices.size(), yz.get()/vertices.size(),
          xz.get()/vertices.size(), yz.get()/vertices.size(), zz.get()/vertices.size();
@@ -600,20 +600,20 @@ void Membrane
 
 void Bonds
 (
-   const unsigned int& step, 
-   const std::vector<std::string>& list_vertices, 
+   const unsigned int& step,
+   const std::vector<std::string>& list_vertices,
    const std::vector<std::string>& list_bonds
 )
 {
    const std::string str_step = boost::lexical_cast<std::string> (step);
    const std::vector<Coordinate>& bonds_points = TextReader::cast_Coordinate(list_vertices);
    const std::vector<Bond>& bonds = TextReader::cast_Bond(list_bonds);
-   
+
    typedef int scalar;
    std::vector<std::pair<std::vector<Vector3D>, scalar> > rectangles_info;
 
    for(int i=0, size=bonds.size(); i<size; ++i)
-   {  
+   {
       std::vector<std::pair<Vector3D, Vector3D> > List_of_MakeBond;
       bool pending =true;
 
@@ -637,11 +637,11 @@ void Bonds
                      const double parameter=(Cell_length[d]*j-(normal_vector_of_plane*a))
                                              /(normal_vector_of_plane*(b-a));
                      const Vector3D cross_point=(a+(b-a)*parameter);
-                     return cross_point; 
+                     return cross_point;
                   }(A, B_dash);
                   cross_point_list.push_back(result);
                }
-               repeat_f=false;   
+               repeat_f=false;
             }
             else if(d==(Dimention-1)&& repeat_f)
             {
@@ -664,7 +664,7 @@ void Bonds
                   }
                }
             }
-            return result; 
+            return result;
          }();
 
          if(!repeat_f)
@@ -713,13 +713,13 @@ void Bonds
    std::vector<Rectangle> rectangles_index(Devide_tube);
    for(int i=0; i<Devide_tube; ++i)
    {
-      rectangles_index[i].a = i;                 
-      rectangles_index[i].b = (i+1)%Devide_tube; 
+      rectangles_index[i].a = i;
+      rectangles_index[i].b = (i+1)%Devide_tube;
       rectangles_index[i].c = rectangles_index[i].a + Devide_tube;
       rectangles_index[i].d = rectangles_index[i].b + Devide_tube;
    }
-   
-   //Output 
+
+   //Output
    std::string tube_file = output_file+"_tube_"+ str_step+".vtk";
    std::ofstream ofs_t(tube_file, std::ios::trunc);
    ofs_t<<"# vtk DataFile Version 2.0"<<std::endl;
@@ -827,7 +827,7 @@ inline void step_picker (const std::string& req, bool& setuped_f)
          std::vector<std::string> snd;
          const std::string snd_delimiter="-";
          boost::split(snd,fst[i],boost::is_any_of(snd_delimiter));
-         
+
          if(snd.size()==1)
          {
             steps.push_back(active_step_unit(str2step(snd[0])));
@@ -851,10 +851,10 @@ str_list
    while(stream.is_open()&&!fin_f)
    {
       try{
-      const std::string tmp = stream.get();  
+      const std::string tmp = stream.get();
       std::vector<std::string> vs;
       boost::algorithm::split(vs,tmp,boost::is_any_of(" ,\t"));
-   
+
       if("#"==vs[0])
       {
          if(read_f)
@@ -892,7 +892,7 @@ str_list
 inline void help()
 {
    printf("\x1b[35m");
-   std::cout<<"                       Y U B A                                   v. 3.0.1"<<std::endl;
+   std::cout<<"                       Y U B A                                   v. 3.1.0"<<std::endl;
    std::cout<<std::endl;
    printf("\x1b[32m");
    std::cout<<"                    Essential:"<<std::endl;
@@ -916,7 +916,7 @@ inline void help()
    std::cout<<"           Other  : PCA=true"<<std::endl;
    std::cout<<std::endl;
    printf("\x1b[31m");
-   printf("\x1b[39m"); 
+   printf("\x1b[39m");
    printf("\x1b[49m");
    std::cout<<"       Bug report : @master-yde ( tetra, bond, scalar )"<<std::endl;
    std::cout<<"                    @misteltein ( otherwise )"<<std::endl;

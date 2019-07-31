@@ -54,7 +54,7 @@ void Beads_base
    boost::format pole("3 %d %d %d");
    boost::format equator("4 %d %d %d %d");
    ofs_b<<"POLYGONS "<<(triangles.size()+quadrangles.size())*beads.size()<<" "<<(4*triangles.size()+5*quadrangles.size())*beads.size()<<std::endl;
-   
+
    const int polygon_size = (points.size());
    for(size_t i=0,size=beads.size();i<size;++i)
    {
@@ -119,7 +119,7 @@ void Beads_ex_base
    boost::format pole("3 %d %d %d");
    boost::format equator("4 %d %d %d %d");
    ofs_b<<"POLYGONS "<<(triangles.size()+quadrangles.size())*beads_ex.size()<<" "<<(4*triangles.size()+5*quadrangles.size())*beads_ex.size()<<std::endl;
-   
+
    const int polygon_size = (points.size());
    for(size_t i=0,size=beads_ex.size();i<size;++i)
    {
@@ -178,8 +178,8 @@ void E2_base
       const double& a     = e2.a;
       const double& b     = e2.b;
 
-      auto etmp = Ellipsoid(a,b,Devide_N); 
-     
+      auto etmp = Ellipsoid(a,b,Devide_N);
+
       //rot
       std::vector<Vector3D>& ps = std::get<std::vector<Vector3D> >(etmp);
       std::for_each(ps.begin(),ps.end(),[&theta,&rot](auto& v){v=rot(v,theta);});
@@ -246,6 +246,16 @@ void Beads
       if(vs.size()==5)//index x y z scalar
       {
          res.push_back(boost::lexical_cast<double>(vs.back()));
+      }
+      if(vs.size()==7)//index qx qy qz px py pz
+      {
+         //scalar <- p^2
+         res.push_back
+            (
+               std::pow(boost::lexical_cast<double>(vs.at(4)),2)+
+               std::pow(boost::lexical_cast<double>(vs.at(5)),2)+
+               std::pow(boost::lexical_cast<double>(vs.at(6)),2)
+            );
       }
       else{std::cout<<"defect __LINE__"<<std::endl;exit(0);}
       }
